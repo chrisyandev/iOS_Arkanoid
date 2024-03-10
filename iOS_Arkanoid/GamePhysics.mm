@@ -1,8 +1,10 @@
 #include <Box2D/Box2D.h>
 #include "GamePhysics.h"
 #include <stdio.h>
+#include <iostream>
 #include <map>
 #include <string>
+#include <queue>
 
 // Some Box2D engine paremeters
 const float MAX_TIMESTEP = 1.0f/60.0f;
@@ -29,11 +31,11 @@ public:
             // This is needed because this handler may be running in a different thread and this
             //  class does not know about the CBox2D that's running the physics
             struct PhysicsObject *objData = (struct PhysicsObject *)(bodyA->GetUserData());
-            GamePhysics *parentObj = (__bridge GamePhysics *)(objData->box2DObj);
+            GamePhysics *parentObj = (__bridge GamePhysics *)(objData->gamePhysObj);
             
             if (objData->objType == ObjTypeBrick) {
                 // Call RegisterHit (assume CBox2D object is in user data)
-                [parentObj RegisterHit];    // assumes RegisterHit is a callback function to register collision
+                [parentObj RegisterHit:objData->name];    // assumes RegisterHit is a callback function to register collision
             }
         }
     }
@@ -57,6 +59,7 @@ public:
     bool ballHitBrick;  // register that the ball hit the break
     bool ballLaunched;  // register that the user has launched the ball
     float nextPaddlePosX; // next paddle position to set in update loop
+    std::queue<std::string> bricksToDestroy;
 }
 @end
 
@@ -75,21 +78,38 @@ public:
         // Set up the brick and ball objects for Box2D
         struct PhysicsObject *newObj = new struct PhysicsObject;
         newObj->objType = ObjTypeBrick;
-        char *objName = strdup("Brick");
         
         for (int row = 0; row < BRICK_ROW_COUNT; row++) {
             for (int col = 0; col < BRICK_COL_COUNT; col++) {
+                newObj = new struct PhysicsObject;
+                
+                // Set the identifier of the brick
+                char *objName;
+                std::string nameConcat = "Brick" + std::to_string(row) + std::to_string(col);
+                const char *nameConcatCStr = nameConcat.c_str();
+                objName = strdup(nameConcatCStr);
+                newObj->name = objName;
+                
+                // Set the physics location of the brick
                 newObj->loc.x = BRICK_POS_X + col * BRICK_WIDTH + BRICK_SPACER;
                 newObj->loc.y = BRICK_POS_Y + row * BRICK_HEIGHT + BRICK_SPACER;
+                // Add variation to column positions
+                if (row % 2 == 0) {
+                    newObj->loc.x += BRICK_WIDTH/2;
+                }
+                
                 [self AddObject:objName newObject:newObj];
             }
         }
         
+        // Create ball object
+        char *objName;
         newObj = new struct PhysicsObject;
         newObj->loc.x = BALL_POS_X;
         newObj->loc.y = BALL_POS_Y;
         newObj->objType = ObjTypeBall;
         objName = strdup("Ball");
+        newObj->name = objName;
         [self AddObject:objName newObject:newObj];
         
         // Create paddle object
@@ -98,6 +118,7 @@ public:
         newObj->loc.y = PADDLE_POS_Y;
         newObj->objType = ObjTypePaddle;
         objName = strdup("Paddle");
+        newObj->name = objName;
         [self AddObject:objName newObject:newObj];
         
         totalElapsedTime = 0;
@@ -116,10 +137,10 @@ public:
 
 - (void) Update:(float)elapsedTime {
     // Get pointers to the brick and ball physics objects
-    struct PhysicsObject *theBrick = physicsObjects["Brick"];
     struct PhysicsObject *theBall = physicsObjects["Ball"];
     struct PhysicsObject *thePaddle = physicsObjects["Paddle"];
     
+    // Update paddle position
     b2Vec2 newPaddlePos = b2Vec2(nextPaddlePosX, thePaddle->loc.y);
     ((b2Body *)thePaddle->b2ShapePtr)->SetTransform(newPaddlePos, thePaddle->loc.theta);
     
@@ -134,11 +155,11 @@ public:
         ballLaunched = false;
     }
     
-    // Check if it is time yet to drop the brick, and if so call SetAwake()
-    totalElapsedTime += elapsedTime;
-    if ((totalElapsedTime > BRICK_WAIT) && theBrick && theBrick->b2ShapePtr) {
-        ((b2Body *)theBrick->b2ShapePtr)->SetAwake(true);
-    }
+//    // Check if it is time yet to drop the brick, and if so call SetAwake()
+//    totalElapsedTime += elapsedTime;
+//    if ((totalElapsedTime > BRICK_WAIT) && theBrick && theBrick->b2ShapePtr) {
+//        ((b2Body *)theBrick->b2ShapePtr)->SetAwake(true);
+//    }
     
     // Use these lines for debugging the brick and ball positions
     //    if (theBrick)
@@ -152,7 +173,7 @@ public:
     //    printf("\n");
     
     // If the last collision test was positive, stop the ball and destroy the brick
-    if (ballHitBrick) {
+//    if (ballHitBrick) {
         // Stop the ball and make sure it is not affected by forces
 //        ((b2Body *)theBall->b2ShapePtr)->SetLinearVelocity(b2Vec2(0, 0));
 //        ((b2Body *)theBall->b2ShapePtr)->SetAngularVelocity(0);
@@ -160,11 +181,22 @@ public:
 //        ((b2Body *)theBall->b2ShapePtr)->SetActive(false);
         
         // Destroy the brick from Box2D and related objects in this class
-        world->DestroyBody(((b2Body *)theBrick->b2ShapePtr));
-        delete theBrick;
-        theBrick = nullptr;
-        physicsObjects.erase("Brick");
-        ballHitBrick = false;   // until a reset and re-launch
+//        world->DestroyBody(((b2Body *)theBrick->b2ShapePtr));
+//        delete theBrick;
+//        theBrick = nullptr;
+//        physicsObjects.erase("Brick");
+//        ballHitBrick = false;   // until a reset and re-launch
+//    }
+    
+    // Destroy next brick in the queue
+    while (!bricksToDestroy.empty()) {
+        std::string brickName = bricksToDestroy.front();
+        struct PhysicsObject *brick = physicsObjects[brickName];
+        world->DestroyBody((b2Body *)brick->b2ShapePtr);
+        delete brick;
+        brick = nullptr;
+        physicsObjects.erase(brickName);
+        bricksToDestroy.pop();
     }
     
     if (world) {
@@ -188,9 +220,9 @@ public:
     
 }
 
-- (void) RegisterHit {
-    // Set some flag here for processing later...
-    ballHitBrick = true;
+- (void) RegisterHit:(char *)name {
+    // add bricks to destroy for processing later...
+    bricksToDestroy.push(name);
 }
 
 - (void) LaunchBall {
@@ -219,7 +251,7 @@ public:
     
     // Setup our physics object and store this object and the shape
     newObj->b2ShapePtr = (void *)theObject;
-    newObj->box2DObj = (__bridge void *)self;
+    newObj->gamePhysObj = (__bridge void *)self;
     
     // Set the user data to be this object and keep it asleep initially
     theObject->SetUserData(newObj);

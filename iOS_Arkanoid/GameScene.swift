@@ -43,9 +43,16 @@ class GameScene: SCNScene {
                 let theBrick = SCNNode(geometry: SCNBox(width: CGFloat(BRICK_WIDTH), height: CGFloat(BRICK_HEIGHT), length: 1, chamferRadius: 0))
                 theBrick.name = "Brick" + String(row) + String(col)
                 theBrick.geometry?.firstMaterial?.diffuse.contents = UIColor.red
-                let posX = BRICK_POS_X + Float(col) * (BRICK_WIDTH + BRICK_SPACER)
-                let posY = BRICK_POS_Y + Float(row) * (BRICK_HEIGHT + BRICK_SPACER)
+                
+                // Set the rendering position of the brick
+                var posX = BRICK_POS_X + Float(col) * (BRICK_WIDTH + BRICK_SPACER)
+                var posY = BRICK_POS_Y + Float(row) * (BRICK_HEIGHT + BRICK_SPACER)
+                // Add variation to column positions
+                if (row % 2 == 0) {
+                    posX += BRICK_WIDTH/2
+                }
                 theBrick.position = SCNVector3(posX, posY, 0)
+                
                 rootNode.addChildNode(theBrick)
             }
         }
@@ -83,25 +90,27 @@ class GameScene: SCNScene {
     func updateGameObjects(elapsedTime: Double) {
         gamePhysics.update(Float(elapsedTime))
         
-        let ballPos = UnsafePointer(gamePhysics.getObject("Ball"))
+        let ballPhysObj = UnsafePointer(gamePhysics.getObject("Ball"))
         let theBall = rootNode.childNode(withName: "Ball", recursively: true)
-        theBall?.position.x = (ballPos?.pointee.loc.x)!
-        theBall?.position.y = (ballPos?.pointee.loc.y)!
+        theBall?.position.x = (ballPhysObj?.pointee.loc.x)!
+        theBall?.position.y = (ballPhysObj?.pointee.loc.y)!
         
-        let brickPos = UnsafePointer(gamePhysics.getObject("Brick"))
-        let theBrick = rootNode.childNode(withName: "Brick", recursively: true)
-        
-        if (brickPos != nil) {
-            theBrick?.position.x = (brickPos?.pointee.loc.x)!
-            theBrick?.position.y = (brickPos?.pointee.loc.y)!
-        } else {
-            theBrick?.isHidden = true
+        // If the physics object for the brick was destroyed, de-render the brick
+        for row in 0..<BRICK_ROW_COUNT {
+            for col in 0..<BRICK_COL_COUNT {
+                let brickName = "Brick" + String(row) + String(col)
+                let brickPhysObj = UnsafePointer(gamePhysics.getObject(brickName))
+                if (brickPhysObj == nil) {
+                    let theBrick = rootNode.childNode(withName: brickName, recursively: true)
+                    theBrick?.isHidden = true
+                }
+            }
         }
         
-        let paddlePos = UnsafePointer(gamePhysics.getObject("Paddle"))
+        let paddlePhysObj = UnsafePointer(gamePhysics.getObject("Paddle"))
         let thePaddle = rootNode.childNode(withName: "Paddle", recursively: true)
-        thePaddle?.position.x = (paddlePos?.pointee.loc.x)!
-        thePaddle?.position.y = (paddlePos?.pointee.loc.y)!
+        thePaddle?.position.x = (paddlePhysObj?.pointee.loc.x)!
+        thePaddle?.position.y = (paddlePhysObj?.pointee.loc.y)!
     }
     
     @MainActor

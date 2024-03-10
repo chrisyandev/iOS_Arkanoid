@@ -3,13 +3,13 @@
 
 #import <Foundation/NSObject.h>
 
-#define BRICK_POS_X         -10.0f
+#define BRICK_POS_X         -15.0f
 #define BRICK_POS_Y         70.0f
-#define BRICK_WIDTH         5.0f
+#define BRICK_WIDTH         10.0f
 #define BRICK_HEIGHT        5.0f
 #define BRICK_SPACER        1.0f
 #define BRICK_ROW_COUNT     3
-#define BRICK_COL_COUNT     4
+#define BRICK_COL_COUNT     3
 #define BRICK_WAIT          1000.0f
 #define BALL_POS_X          0.0f
 #define BALL_POS_Y          7.0f
@@ -33,7 +33,8 @@ struct PhysicsObject {
     struct PhysicsLocation loc;     // location
     ObjectType objType;             // type
     void *b2ShapePtr;               // pointer to Box2D shape definition
-    void *box2DObj;                 // pointer to the CBox2D object for use in callbacks
+    void *gamePhysObj;              // pointer to the GamePhysics instance for use in callbacks
+    char *name;                     // identifier
 };
 
 // Wrapper class
@@ -41,7 +42,7 @@ struct PhysicsObject {
 -(void) LaunchBall;                 // Launch the ball
 -(void) MovePaddleX:(float)x;       // Move the paddle on X axis
 -(void) Update:(float)elapsedTime;  // Update the Box2D engine
--(void) RegisterHit;                // Register when the ball hits the brick
+-(void) RegisterHit:(char* )name;   // Register when the ball hits the brick
 -(void) AddObject:(char *)name newObject:(struct PhysicsObject *)newObj;    // Add a new physics object
 -(struct PhysicsObject *) GetObject:(const char *)name; // Get a physics object by name
 -(void) Reset;                      // Reset Box2D
