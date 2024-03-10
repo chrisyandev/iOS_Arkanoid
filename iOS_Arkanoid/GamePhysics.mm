@@ -31,8 +31,10 @@ public:
             struct PhysicsObject *objData = (struct PhysicsObject *)(bodyA->GetUserData());
             GamePhysics *parentObj = (__bridge GamePhysics *)(objData->box2DObj);
             
-            // Call RegisterHit (assume CBox2D object is in user data)
-            [parentObj RegisterHit];    // assumes RegisterHit is a callback function to register collision
+            if (objData->objType == ObjTypeBrick) {
+                // Call RegisterHit (assume CBox2D object is in user data)
+                [parentObj RegisterHit];    // assumes RegisterHit is a callback function to register collision
+            }
         }
     }
     void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {};
@@ -51,14 +53,10 @@ public:
     // Map to keep track of physics object to communicate with the renderer
     std::map<std::string, struct PhysicsObject *> physicsObjects;
 
-#ifdef USE_HELLO_WORLD
-    b2BodyDef *groundBodyDef;
-    b2Body *groundBody;
-    b2PolygonShape *groundBox;
-#endif
     // Logit for this particular "game"
     bool ballHitBrick;  // register that the ball hit the break
     bool ballLaunched;  // register that the user has launched the ball
+    float nextPaddlePosX; // next paddle position to set in update loop
 }
 @end
 
@@ -71,11 +69,6 @@ public:
         gravity = new b2Vec2(0.0f, -10.0f);
         world = new b2World(*gravity);
         
-#ifdef USE_HELLO_WORLD
-        groundBodyDef = NULL;
-        groundBody = NULL;
-        groundBox = NULL;
-#endif
         contactListener = new CContactListener();
         world->SetContactListener(contactListener);
         
@@ -83,38 +76,47 @@ public:
         struct PhysicsObject *newObj = new struct PhysicsObject;
         newObj->loc.x = BRICK_POS_X;
         newObj->loc.y = BRICK_POS_Y;
-        newObj->objType = ObjTypeBox;
+        newObj->objType = ObjTypeBrick;
         char *objName = strdup("Brick");
         [self AddObject:objName newObject:newObj];
         
         newObj = new struct PhysicsObject;
         newObj->loc.x = BALL_POS_X;
         newObj->loc.y = BALL_POS_Y;
-        newObj->objType = ObjTypeCircle;
+        newObj->objType = ObjTypeBall;
         objName = strdup("Ball");
+        [self AddObject:objName newObject:newObj];
+        
+        // Create paddle object
+        newObj = new struct PhysicsObject;
+        newObj->loc.x = PADDLE_POS_X;
+        newObj->loc.y = PADDLE_POS_Y;
+        newObj->objType = ObjTypePaddle;
+        objName = strdup("Paddle");
         [self AddObject:objName newObject:newObj];
         
         totalElapsedTime = 0;
         ballHitBrick = false;
         ballLaunched = false;
+        nextPaddlePosX = PADDLE_POS_X;
     }
     return self;
 }
 
-- (void)dealloc {
+- (void) dealloc {
     if (gravity) delete gravity;
     if (world) delete world;
-#ifdef USE_HELLO_WORLD
-    if (groundBodyDef) delete groundBodyDef;
-    if (groundBox) delete groundBox;
-#endif
     if (contactListener) delete contactListener;
 }
 
--(void)Update:(float)elapsedTime {
+- (void) Update:(float)elapsedTime {
     // Get pointers to the brick and ball physics objects
-    struct PhysicsObject *theBrick = physicsObjects[std::string("Brick")];
+    struct PhysicsObject *theBrick = physicsObjects["Brick"];
     struct PhysicsObject *theBall = physicsObjects["Ball"];
+    struct PhysicsObject *thePaddle = physicsObjects["Paddle"];
+    
+    b2Vec2 newPaddlePos = b2Vec2(nextPaddlePosX, thePaddle->loc.y);
+    ((b2Body *)thePaddle->b2ShapePtr)->SetTransform(newPaddlePos, thePaddle->loc.theta);
     
     // Check here if we need to launch the ball
     //  and if so, use ApplyLinearImpulse() and SetActive(true)
@@ -181,21 +183,31 @@ public:
     
 }
 
--(void)RegisterHit {
+- (void) RegisterHit {
     // Set some flag here for processing later...
     ballHitBrick = true;
 }
 
--(void)LaunchBall {
+- (void) LaunchBall {
     // Set some flag here for processing later...
     ballLaunched = true;
 }
 
--(void) AddObject:(char *)name newObject:(struct PhysicsObject *)newObj {
+- (void) MovePaddleX:(float)x {
+    nextPaddlePosX += x;
+}
+
+- (void) AddObject:(char *)name newObject:(struct PhysicsObject *)newObj {
     // Set up the body definition and create the body from it
     b2BodyDef bodyDef;
     b2Body *theObject;
-    bodyDef.type = b2_dynamicBody;
+    
+    if (newObj->objType == ObjTypePaddle) { // paddle is kinematic
+        bodyDef.type = b2_kinematicBody;
+    } else {
+        bodyDef.type = b2_dynamicBody;
+    }
+
     bodyDef.position.Set(newObj->loc.x, newObj->loc.y);
     theObject = world->CreateBody(&bodyDef);
     if (!theObject) return;
@@ -214,20 +226,27 @@ public:
     b2FixtureDef fixtureDef;
     
     switch (newObj->objType) {
-        case ObjTypeBox:
+        case ObjTypeBrick:
             dynamicBox.SetAsBox(BRICK_WIDTH/2, BRICK_HEIGHT/2);
             fixtureDef.shape = &dynamicBox;
             fixtureDef.density = 1.0f;
             fixtureDef.friction = 0.3f;
             fixtureDef.restitution = 1.0f;
             break;
-        case ObjTypeCircle:
+        case ObjTypeBall:
             circle.m_radius = BALL_RADIUS;
             fixtureDef.shape = &circle;
             fixtureDef.density = 1.0f;
             fixtureDef.friction = 0.3f;
             fixtureDef.restitution = 1.0f;
             theObject->SetGravityScale(0.0f);
+            break;
+        case ObjTypePaddle:
+            dynamicBox.SetAsBox(PADDLE_WIDTH/2, PADDLE_HEIGHT/2);
+            fixtureDef.shape = &dynamicBox;
+            fixtureDef.density = 1.0f;
+            fixtureDef.friction = 0.3f;
+            fixtureDef.restitution = 1.0f;
             break;
         default:
             break;
@@ -237,11 +256,11 @@ public:
     physicsObjects[name] = newObj;
 }
 
--(struct PhysicsObject *) GetObject:(const char *)name {
+- (struct PhysicsObject *) GetObject:(const char *)name {
     return physicsObjects[name];
 }
 
--(void)Reset {
+- (void) Reset {
     // Look up the brick, and if it exists, destroy it and delete it
     struct PhysicsObject *theBrick = physicsObjects["Brick"];
     if (theBrick) {
@@ -255,7 +274,7 @@ public:
     theBrick = new struct PhysicsObject;
     theBrick->loc.x = BRICK_POS_X;
     theBrick->loc.y = BRICK_POS_Y;
-    theBrick->objType = ObjTypeBox;
+    theBrick->objType = ObjTypeBrick;
     char *objName = strdup("Brick");
     [self AddObject:objName newObject:theBrick];
     
@@ -269,9 +288,20 @@ public:
     ((b2Body *)theBall->b2ShapePtr)->SetAwake(false);
     ((b2Body *)theBall->b2ShapePtr)->SetActive(true);
     
+    // Look up the paddle object and re-initialize the position, etc.
+    struct PhysicsObject *thePaddle = physicsObjects["Paddle"];
+    thePaddle->loc.x = PADDLE_POS_X;
+    thePaddle->loc.y = PADDLE_POS_Y;
+    ((b2Body *)thePaddle->b2ShapePtr)->SetTransform(b2Vec2(PADDLE_POS_X, PADDLE_POS_Y), 0);
+    ((b2Body *)thePaddle->b2ShapePtr)->SetLinearVelocity(b2Vec2(0, 0));
+    ((b2Body *)thePaddle->b2ShapePtr)->SetAngularVelocity(0);
+    ((b2Body *)thePaddle->b2ShapePtr)->SetAwake(false);
+    ((b2Body *)thePaddle->b2ShapePtr)->SetActive(true);
+    
     totalElapsedTime = 0;
     ballHitBrick = false;
     ballLaunched = false;
+    nextPaddlePosX = PADDLE_POS_X;
 }
 
 @end

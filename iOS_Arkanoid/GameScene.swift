@@ -15,6 +15,7 @@ class GameScene: SCNScene {
         
         addBall()
         addBricks()
+        addPaddle()
         
         gamePhysics = GamePhysics()
         
@@ -73,6 +74,14 @@ class GameScene: SCNScene {
         rootNode.addChildNode(theBall)
     }
     
+    func addPaddle() {
+        let thePaddle = SCNNode(geometry: SCNBox(width: CGFloat(PADDLE_WIDTH), height: CGFloat(PADDLE_HEIGHT), length: 1, chamferRadius: 0))
+        thePaddle.name = "Paddle"
+        thePaddle.geometry?.firstMaterial?.diffuse.contents = UIColor.white
+        thePaddle.position = SCNVector3(Int(PADDLE_POS_X), Int(PADDLE_POS_Y), 0)
+        rootNode.addChildNode(thePaddle)
+    }
+    
     @MainActor
     @objc
     func gameLoop(displaylink: CADisplayLink) {
@@ -102,11 +111,23 @@ class GameScene: SCNScene {
         } else {
             theBrick?.isHidden = true
         }
+        
+        let paddlePos = UnsafePointer(gamePhysics.getObject("Paddle"))
+        let thePaddle = rootNode.childNode(withName: "Paddle", recursively: true)
+        thePaddle?.position.x = (paddlePos?.pointee.loc.x)!
+        thePaddle?.position.y = (paddlePos?.pointee.loc.y)!
     }
     
     @MainActor
     func handleTap() {
         gamePhysics.launchBall()
+    }
+    
+    @MainActor
+    func handlePan(_ velocity: CGPoint) {
+        let sensitivityModifier = 0.01
+        let panX = Float(velocity.x * sensitivityModifier)
+        gamePhysics.movePaddleX(panX)
     }
     
     @MainActor

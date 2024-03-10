@@ -3,18 +3,22 @@
 
 #import <Foundation/NSObject.h>
 
-#define BRICK_POS_X         0
-#define BRICK_POS_Y         90
+#define BRICK_POS_X         0.0f
+#define BRICK_POS_Y         90.0f
 #define BRICK_WIDTH         10.0f
 #define BRICK_HEIGHT        5.0f
-#define BRICK_WAIT          1.0f
-#define BALL_POS_X          0
-#define BALL_POS_Y          5
+#define BRICK_WAIT          1000.0f
+#define BALL_POS_X          0.0f
+#define BALL_POS_Y          7.0f
 #define BALL_RADIUS         3.0f
 #define BALL_VELOCITY       1000.0f
+#define PADDLE_POS_X        0.0f
+#define PADDLE_POS_Y        0.0f
+#define PADDLE_WIDTH        20.0f
+#define PADDLE_HEIGHT       5.0f
 
 // You can define other object types here
-typedef enum { ObjTypeBox=0, ObjTypeCircle=1, ObjTypePaddle=2 } ObjectType;
+typedef enum { ObjTypeBrick=0, ObjTypeBall=1, ObjTypePaddle=2 } ObjectType;
 
 // Location of each object in our physics world
 struct PhysicsLocation {
@@ -32,6 +36,7 @@ struct PhysicsObject {
 // Wrapper class
 @interface GamePhysics : NSObject
 -(void) LaunchBall;                 // Launch the ball
+-(void) MovePaddleX:(float)x;       // Move the paddle on X axis
 -(void) Update:(float)elapsedTime;  // Update the Box2D engine
 -(void) RegisterHit;                // Register when the ball hits the brick
 -(void) AddObject:(char *)name newObject:(struct PhysicsObject *)newObj;    // Add a new physics object

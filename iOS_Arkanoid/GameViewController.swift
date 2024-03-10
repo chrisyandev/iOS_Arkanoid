@@ -38,7 +38,11 @@ class GameViewController: UIViewController {
         
         // add a tap gesture recognizer
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+        tapGesture.numberOfTapsRequired = 2
         scnView.addGestureRecognizer(tapGesture)
+        
+        let panGesture = UIPanGestureRecognizer(target:self, action: #selector(handlePan(_:)))
+        self.view.addGestureRecognizer(panGesture)
     }
     
     @objc
@@ -77,6 +81,13 @@ class GameViewController: UIViewController {
             
             SCNTransaction.commit()
         }
+    }
+    
+    @objc
+    func handlePan(_ gesture: UIPanGestureRecognizer) {
+        let scnView = self.view as! SCNView
+        
+        gameScene.handlePan(gesture.velocity(in: scnView))
     }
     
     override var prefersStatusBarHidden: Bool {
