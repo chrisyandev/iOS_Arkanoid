@@ -3,10 +3,13 @@
 
 #import <Foundation/NSObject.h>
 
-#define BRICK_POS_X         0.0f
-#define BRICK_POS_Y         90.0f
-#define BRICK_WIDTH         10.0f
+#define BRICK_POS_X         -10.0f
+#define BRICK_POS_Y         70.0f
+#define BRICK_WIDTH         5.0f
 #define BRICK_HEIGHT        5.0f
+#define BRICK_SPACER        1.0f
+#define BRICK_ROW_COUNT     3
+#define BRICK_COL_COUNT     4
 #define BRICK_WAIT          1000.0f
 #define BALL_POS_X          0.0f
 #define BALL_POS_Y          7.0f

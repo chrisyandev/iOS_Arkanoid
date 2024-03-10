@@ -38,30 +38,16 @@ class GameScene: SCNScene {
     
     
     func addBricks() {
-        let theBrick = SCNNode(geometry: SCNBox(width: CGFloat(BRICK_WIDTH), height: CGFloat(BRICK_HEIGHT), length: 1, chamferRadius: 0))
-        theBrick.name = "Brick"
-        theBrick.geometry?.firstMaterial?.diffuse.contents = UIColor.red
-        theBrick.position = SCNVector3(Int(BRICK_POS_X), Int(BRICK_POS_Y), 0)
-        rootNode.addChildNode(theBrick)
-        
-        let spacer = Float(5)
-        
-        let positions = [
-            SCNVector3(Int(Float(BRICK_POS_X) - BRICK_WIDTH - spacer), Int(BRICK_POS_Y), 0),
-            SCNVector3(Int(Float(BRICK_POS_X) + BRICK_WIDTH + spacer), Int(BRICK_POS_Y), 0)
-        ]
-        
-        let colors = [
-            UIColor.green,
-            UIColor.blue
-        ]
-        
-        for i in positions.indices {
-            let newBrick = SCNNode(geometry: SCNBox(width: CGFloat(BRICK_WIDTH), height: CGFloat(BRICK_HEIGHT), length: 1, chamferRadius: 0))
-            newBrick.name = "Brick" + String(i)
-            newBrick.geometry?.firstMaterial?.diffuse.contents = colors[i]
-            newBrick.position = positions[i]
-            rootNode.addChildNode(newBrick)
+        for row in 0..<BRICK_ROW_COUNT {
+            for col in 0..<BRICK_COL_COUNT {
+                let theBrick = SCNNode(geometry: SCNBox(width: CGFloat(BRICK_WIDTH), height: CGFloat(BRICK_HEIGHT), length: 1, chamferRadius: 0))
+                theBrick.name = "Brick" + String(row) + String(col)
+                theBrick.geometry?.firstMaterial?.diffuse.contents = UIColor.red
+                let posX = BRICK_POS_X + Float(col) * (BRICK_WIDTH + BRICK_SPACER)
+                let posY = BRICK_POS_Y + Float(row) * (BRICK_HEIGHT + BRICK_SPACER)
+                theBrick.position = SCNVector3(posX, posY, 0)
+                rootNode.addChildNode(theBrick)
+            }
         }
     }
     

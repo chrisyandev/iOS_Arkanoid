@@ -74,11 +74,16 @@ public:
         
         // Set up the brick and ball objects for Box2D
         struct PhysicsObject *newObj = new struct PhysicsObject;
-        newObj->loc.x = BRICK_POS_X;
-        newObj->loc.y = BRICK_POS_Y;
         newObj->objType = ObjTypeBrick;
         char *objName = strdup("Brick");
-        [self AddObject:objName newObject:newObj];
+        
+        for (int row = 0; row < BRICK_ROW_COUNT; row++) {
+            for (int col = 0; col < BRICK_COL_COUNT; col++) {
+                newObj->loc.x = BRICK_POS_X + col * BRICK_WIDTH + BRICK_SPACER;
+                newObj->loc.y = BRICK_POS_Y + row * BRICK_HEIGHT + BRICK_SPACER;
+                [self AddObject:objName newObject:newObj];
+            }
+        }
         
         newObj = new struct PhysicsObject;
         newObj->loc.x = BALL_POS_X;
@@ -149,10 +154,10 @@ public:
     // If the last collision test was positive, stop the ball and destroy the brick
     if (ballHitBrick) {
         // Stop the ball and make sure it is not affected by forces
-        ((b2Body *)theBall->b2ShapePtr)->SetLinearVelocity(b2Vec2(0, 0));
-        ((b2Body *)theBall->b2ShapePtr)->SetAngularVelocity(0);
-        ((b2Body *)theBall->b2ShapePtr)->SetAwake(false);
-        ((b2Body *)theBall->b2ShapePtr)->SetActive(false);
+//        ((b2Body *)theBall->b2ShapePtr)->SetLinearVelocity(b2Vec2(0, 0));
+//        ((b2Body *)theBall->b2ShapePtr)->SetAngularVelocity(0);
+//        ((b2Body *)theBall->b2ShapePtr)->SetAwake(false);
+//        ((b2Body *)theBall->b2ShapePtr)->SetActive(false);
         
         // Destroy the brick from Box2D and related objects in this class
         world->DestroyBody(((b2Body *)theBrick->b2ShapePtr));
@@ -202,7 +207,7 @@ public:
     b2BodyDef bodyDef;
     b2Body *theObject;
     
-    if (newObj->objType == ObjTypePaddle) { // paddle is kinematic
+    if (newObj->objType == ObjTypePaddle || newObj->objType == ObjTypeBrick) { // paddle and brick are kinematic
         bodyDef.type = b2_kinematicBody;
     } else {
         bodyDef.type = b2_dynamicBody;
