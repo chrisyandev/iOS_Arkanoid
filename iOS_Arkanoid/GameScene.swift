@@ -7,6 +7,9 @@ class GameScene: SCNScene {
     var lastFrameTime = CFTimeInterval(floatLiteral: 0)
     private var gamePhysics: GamePhysics!
     
+    var viewController: GameViewController!
+    var bricksDestroyed: Int = 0
+    
     override init() {
         super.init()
         
@@ -83,6 +86,7 @@ class GameScene: SCNScene {
             updateGameObjects(elapsedTime: elapsedTime)
         }
         lastFrameTime = displaylink.targetTimestamp
+        
     }
     
     
@@ -95,6 +99,12 @@ class GameScene: SCNScene {
         theBall?.position.x = (ballPhysObj?.pointee.loc.x)!
         theBall?.position.y = (ballPhysObj?.pointee.loc.y)!
         
+        if ((theBall?.position.y)! <= -5) {
+            viewController.updateLives(newLives: viewController.livesRemaining - 1)
+            resetBall()
+        }
+        
+        var currFrameBrickCount = 0
         // If the physics object for the brick was destroyed, de-render the brick
         for row in 0..<BRICK_ROW_COUNT {
             for col in 0..<BRICK_COL_COUNT {
@@ -103,9 +113,13 @@ class GameScene: SCNScene {
                 if (brickPhysObj == nil) {
                     let theBrick = rootNode.childNode(withName: brickName, recursively: true)
                     theBrick?.isHidden = true
+                    currFrameBrickCount = currFrameBrickCount + 1
                 }
             }
         }
+        bricksDestroyed = currFrameBrickCount
+        viewController.updateScore(newScore: bricksDestroyed)
+        
         
         let paddlePhysObj = UnsafePointer(gamePhysics.getObject("Paddle"))
         let thePaddle = rootNode.childNode(withName: "Paddle", recursively: true)
@@ -130,6 +144,11 @@ class GameScene: SCNScene {
         gamePhysics.reset()
         let theBrick = rootNode.childNode(withName: "Brick", recursively: true)
         theBrick?.isHidden = false
+    }
+    
+    @MainActor
+    func resetBall() {
+        gamePhysics.resetBall()
     }
 }
 

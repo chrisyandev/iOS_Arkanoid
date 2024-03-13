@@ -40,6 +40,7 @@ struct PhysicsObject {
 // Wrapper class
 @interface GamePhysics : NSObject
 -(void) LaunchBall;                 // Launch the ball
+-(void) ResetBall;                  // Reset the ball after a life loss
 -(void) MovePaddleX:(float)x;       // Move the paddle on X axis
 -(void) Update:(float)elapsedTime;  // Update the Box2D engine
 -(void) RegisterHit:(char* )name;   // Register when the ball hits the brick

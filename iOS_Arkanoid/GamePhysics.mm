@@ -230,8 +230,28 @@ public:
     ballLaunched = true;
 }
 
+- (void) ResetBall {
+    ballLaunched = false;
+    struct PhysicsObject *theBall = physicsObjects["Ball"];
+    theBall->loc.x = BALL_POS_X;
+    theBall->loc.y = BALL_POS_Y;
+    ((b2Body *)theBall->b2ShapePtr)->SetTransform(b2Vec2(BALL_POS_X, BALL_POS_Y), 0);
+    ((b2Body *)theBall->b2ShapePtr)->SetLinearVelocity(b2Vec2(0, 0));
+    ((b2Body *)theBall->b2ShapePtr)->SetAngularVelocity(0);
+    ((b2Body *)theBall->b2ShapePtr)->SetAwake(false);
+    ((b2Body *)theBall->b2ShapePtr)->SetActive(true);
+}
+
 - (void) MovePaddleX:(float)x {
     nextPaddlePosX += x;
+    
+    if (nextPaddlePosX > 20) {
+        nextPaddlePosX = 20;
+    }
+    
+    if (nextPaddlePosX < -20) {
+        nextPaddlePosX = -20;
+    }
 }
 
 - (void) AddObject:(char *)name newObject:(struct PhysicsObject *)newObj {

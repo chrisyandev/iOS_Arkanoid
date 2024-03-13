@@ -1,16 +1,34 @@
 import UIKit
 import QuartzCore
 import SceneKit
+import SpriteKit
 
-class GameViewController: UIViewController {
+@objc public class GameViewController: UIViewController {
 
     var gameScene: GameScene!
     
-    override func viewDidLoad() {
+    // UI
+    var scoreLabel: SKLabelNode!
+    var livesLabel: SKLabelNode!
+    
+    static var instance: GameViewController? = nil
+    
+    @objc
+    var currentScore: Int = 0
+    @objc
+    var livesRemaining: Int = 3
+    
+    @objc
+    static func GetInstance() -> GameViewController {
+        return instance!
+    }
+
+    public override func viewDidLoad() {
         super.viewDidLoad()
         
         // create a new scene
         gameScene = GameScene()
+        gameScene.viewController = self
         
         // create and add a camera to the scene
         
@@ -26,15 +44,9 @@ class GameViewController: UIViewController {
         
         // retrieve the SCNView
         let scnView = self.view as! SCNView
-        
-        // set the scene to the view
         scnView.scene = gameScene
         
-        // allows the user to manipulate the camera
-        
-        // show statistics such as fps and timing information
-        
-        // configure the view
+        createAndLinkUI(scnView)
         
         // add a tap gesture recognizer
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
@@ -43,6 +55,8 @@ class GameViewController: UIViewController {
         
         let panGesture = UIPanGestureRecognizer(target:self, action: #selector(handlePan(_:)))
         self.view.addGestureRecognizer(panGesture)
+        
+        GameViewController.instance = self
     }
     
     @objc
@@ -90,16 +104,48 @@ class GameViewController: UIViewController {
         gameScene.handlePan(gesture.velocity(in: scnView))
     }
     
-    override var prefersStatusBarHidden: Bool {
+    public override var prefersStatusBarHidden: Bool {
         return true
     }
     
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         if UIDevice.current.userInterfaceIdiom == .phone {
             return .allButUpsideDown
         } else {
             return .all
         }
     }
-
+    
+    private func createAndLinkUI(_ scnView: SCNView) {
+        let spriteKitUIOverlayScene = SKScene(size: CGSizeMake(UIScreen.main.bounds.width, UIScreen.main.bounds.height))
+        spriteKitUIOverlayScene.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        
+        scoreLabel = SKLabelNode()
+        scoreLabel.text = "SCORE: 0"
+        scoreLabel.fontName = "AvenirNext-Bold"
+        scoreLabel.fontColor = SKColor.white
+        scoreLabel.position = CGPoint(x: 0, y: 50)
+        
+        livesLabel = SKLabelNode()
+        livesLabel.fontName = "AvenirNext-Bold"
+        livesLabel.text = "LIVES: 3"
+        livesLabel.fontColor = SKColor.white
+        livesLabel.position = CGPoint(x: 0, y: -100)
+        
+        spriteKitUIOverlayScene.addChild(scoreLabel)
+        spriteKitUIOverlayScene.addChild(livesLabel)
+        scnView.overlaySKScene = spriteKitUIOverlayScene
+    }
+    
+    @objc
+    public func updateScore(newScore: Int) {
+        currentScore = newScore
+        scoreLabel.text = "SCORE: " + String(newScore)
+    }
+    
+    @objc
+    public func updateLives(newLives: Int) {
+        livesRemaining = newLives
+        livesLabel.text = "LIVES: " + String(newLives)
+    }
 }
