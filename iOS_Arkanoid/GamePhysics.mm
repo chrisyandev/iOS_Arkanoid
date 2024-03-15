@@ -121,6 +121,34 @@ public:
         newObj->name = objName;
         [self AddObject:objName newObject:newObj];
         
+        // Create wall objects
+        newObj = new struct PhysicsObject;
+        newObj->loc.x = WALL_NORTH_POS_X;
+        newObj->loc.y = WALL_NORTH_POS_Y;
+        newObj->objType = ObjTypeWallNorth;
+        objName = strdup("NorthWall");
+        newObj->name = objName;
+        [self AddObject:objName newObject:newObj];
+        
+        // Create wall objects
+        newObj = new struct PhysicsObject;
+        newObj->loc.x = WALL_WEST_POS_X;
+        newObj->loc.y = WALL_EASTWEST_POS_Y;
+        newObj->objType = ObjTypeWallSides;
+        objName = strdup("WestWall");
+        newObj->name = objName;
+        [self AddObject:objName newObject:newObj];
+        
+        // Create wall objects
+        newObj = new struct PhysicsObject;
+        newObj->loc.x = WALL_EAST_POS_X;
+        newObj->loc.y = WALL_EASTWEST_POS_Y;
+        newObj->objType = ObjTypeWallSides;
+        objName = strdup("EastWall");
+        newObj->name = objName;
+        [self AddObject:objName newObject:newObj];
+        
+        
         totalElapsedTime = 0;
         ballHitBrick = false;
         ballLaunched = false;
@@ -259,7 +287,10 @@ public:
     b2BodyDef bodyDef;
     b2Body *theObject;
     
-    if (newObj->objType == ObjTypePaddle || newObj->objType == ObjTypeBrick) { // paddle and brick are kinematic
+    // paddle, brick, and walls are kinematic
+    if (newObj->objType == ObjTypePaddle || newObj->objType == ObjTypeBrick
+        || newObj->objType == ObjTypeWallNorth || newObj->objType == ObjTypeWallSides)
+    {
         bodyDef.type = b2_kinematicBody;
     } else {
         bodyDef.type = b2_dynamicBody;
@@ -300,6 +331,20 @@ public:
             break;
         case ObjTypePaddle:
             dynamicBox.SetAsBox(PADDLE_WIDTH/2, PADDLE_HEIGHT/2);
+            fixtureDef.shape = &dynamicBox;
+            fixtureDef.density = 1.0f;
+            fixtureDef.friction = 0.3f;
+            fixtureDef.restitution = 1.0f;
+            break;
+        case ObjTypeWallNorth:
+            dynamicBox.SetAsBox(WALL_NORTH_WIDTH/2, WALL_NORTH_HEIGHT/2);
+            fixtureDef.shape = &dynamicBox;
+            fixtureDef.density = 1.0f;
+            fixtureDef.friction = 0.3f;
+            fixtureDef.restitution = 1.0f;
+            break;
+        case ObjTypeWallSides:
+            dynamicBox.SetAsBox(WALL_EASTWEST_WIDTH/2, WALL_EASTWEST_HEIGHT/2);
             fixtureDef.shape = &dynamicBox;
             fixtureDef.density = 1.0f;
             fixtureDef.friction = 0.3f;

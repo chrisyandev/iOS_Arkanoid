@@ -50,13 +50,22 @@ class GameScene: SCNScene {
         
         //let screenSize = viewController.getScreenBounds()
         //let screenSize = CGRect(x: 0, y: 100, width: 50, height: Int(WALL_THICKNESS))
-        let topWallPos = SCNVector3(x: 0, y: 100, z: 0)
-        let leftWallPos = SCNVector3(x: -25, y: 50, z: 0)
-        let rightWallPos = SCNVector3(x: 25, y: 50, z: 0)
+        let topWallPos = SCNVector3(x: WALL_NORTH_POS_X, y: WALL_NORTH_POS_Y, z: 0)
+        let leftWallPos = SCNVector3(x: WALL_WEST_POS_X, y: WALL_EASTWEST_POS_Y, z: 0)
+        let rightWallPos = SCNVector3(x: WALL_EAST_POS_X, y: WALL_EASTWEST_POS_Y, z: 0)
         
-        let northWall = SCNNode(geometry: SCNBox(width: 100, height: 0.1, length: 10, chamferRadius: 0))
-        let westWall = SCNNode(geometry: SCNBox(width:3, height: 100, length: 10, chamferRadius: 0))
-        let eastWall = SCNNode(geometry: SCNBox(width:3, height: 100, length: 10, chamferRadius: 0))
+        let northWall = SCNNode(geometry: SCNBox(width: CGFloat(WALL_NORTH_WIDTH), 
+                                                 height: CGFloat(WALL_NORTH_HEIGHT),
+                                                 length: 10,
+                                                 chamferRadius: 0))
+        let westWall = SCNNode(geometry: SCNBox(width:CGFloat(WALL_EASTWEST_WIDTH),
+                                                height: CGFloat(WALL_EASTWEST_HEIGHT),
+                                                length: 10,
+                                                chamferRadius: 0))
+        let eastWall = SCNNode(geometry: SCNBox(width:CGFloat(WALL_EASTWEST_WIDTH), 
+                                                height: CGFloat(WALL_EASTWEST_HEIGHT),
+                                                length: 10,
+                                                chamferRadius: 0))
         
         northWall.geometry?.firstMaterial?.diffuse.contents = UIColor.gray
         westWall.geometry?.firstMaterial?.diffuse.contents = UIColor.gray
@@ -65,6 +74,10 @@ class GameScene: SCNScene {
         northWall.position = topWallPos
         westWall.position = leftWallPos
         eastWall.position = rightWallPos
+        
+        northWall.name = "NorthWall"
+        westWall.name = "WestWall"
+        eastWall.name = "EastWall"
         
         rootNode.addChildNode(northWall)
         rootNode.addChildNode(westWall)
