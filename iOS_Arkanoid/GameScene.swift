@@ -19,6 +19,7 @@ class GameScene: SCNScene {
         addBall()
         addBricks()
         addPaddle()
+        addWalls()
         
         gamePhysics = GamePhysics()
         
@@ -39,6 +40,39 @@ class GameScene: SCNScene {
         rootNode.addChildNode(cameraNode)
     }
     
+    
+    
+    func addWalls() {
+        
+        print("Swift is powerful")
+        
+        //print(viewController.livesRemaining)
+        
+        //let screenSize = viewController.getScreenBounds()
+        //let screenSize = CGRect(x: 0, y: 100, width: 50, height: Int(WALL_THICKNESS))
+        let topWallPos = SCNVector3(x: 0, y: 100, z: 0)
+        let leftWallPos = SCNVector3(x: -25, y: 50, z: 0)
+        let rightWallPos = SCNVector3(x: 25, y: 50, z: 0)
+        
+        let northWall = SCNNode(geometry: SCNBox(width: 100, height: 0.1, length: 10, chamferRadius: 0))
+        let westWall = SCNNode(geometry: SCNBox(width:3, height: 100, length: 10, chamferRadius: 0))
+        let eastWall = SCNNode(geometry: SCNBox(width:3, height: 100, length: 10, chamferRadius: 0))
+        
+        northWall.geometry?.firstMaterial?.diffuse.contents = UIColor.gray
+        westWall.geometry?.firstMaterial?.diffuse.contents = UIColor.gray
+        eastWall.geometry?.firstMaterial?.diffuse.contents = UIColor.gray
+
+        northWall.position = topWallPos
+        westWall.position = leftWallPos
+        eastWall.position = rightWallPos
+        
+        rootNode.addChildNode(northWall)
+        rootNode.addChildNode(westWall)
+        rootNode.addChildNode(eastWall)
+        
+    }
+    
+
     
     func addBricks() {
         for row in 0..<BRICK_ROW_COUNT {
@@ -71,7 +105,7 @@ class GameScene: SCNScene {
     }
     
     func addPaddle() {
-        let thePaddle = SCNNode(geometry: SCNBox(width: CGFloat(PADDLE_WIDTH), height: CGFloat(PADDLE_HEIGHT), length: 1, chamferRadius: 0))
+        let thePaddle = SCNNode(geometry: SCNBox(width: CGFloat(PADDLE_WIDTH), height: CGFloat(PADDLE_HEIGHT), length: 1, chamferRadius: 1))
         thePaddle.name = "Paddle"
         thePaddle.geometry?.firstMaterial?.diffuse.contents = UIColor.white
         thePaddle.position = SCNVector3(Int(PADDLE_POS_X), Int(PADDLE_POS_Y), 0)
