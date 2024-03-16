@@ -325,7 +325,7 @@ public:
             circle.m_radius = BALL_RADIUS;
             fixtureDef.shape = &circle;
             fixtureDef.density = 1.0f;
-            fixtureDef.friction = 0.3f;
+            fixtureDef.friction = 0.0f;
             fixtureDef.restitution = 1.0f;
             theObject->SetGravityScale(0.0f);
             break;

@@ -14,7 +14,7 @@
 #define BALL_POS_X            0.0f
 #define BALL_POS_Y            7.0f
 #define BALL_RADIUS           3.0f
-#define BALL_VELOCITY         1000.0f
+#define BALL_VELOCITY         2000.0f
 #define PADDLE_POS_X          0.0f
 #define PADDLE_POS_Y          0.0f
 #define PADDLE_WIDTH          20.0f

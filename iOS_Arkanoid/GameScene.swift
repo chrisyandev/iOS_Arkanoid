@@ -10,6 +10,8 @@ class GameScene: SCNScene {
     var viewController: GameViewController!
     var bricksDestroyed: Int = 0
     
+    var GameInProgress: Bool = false
+    
     override init() {
         super.init()
         
@@ -176,7 +178,11 @@ class GameScene: SCNScene {
     
     @MainActor
     func handleTap() {
-        gamePhysics.launchBall()
+        if ( !GameInProgress ) {
+            print("gameinprog")
+            gamePhysics.launchBall()
+            GameInProgress = true
+        }
     }
     
     @MainActor
@@ -196,6 +202,7 @@ class GameScene: SCNScene {
     @MainActor
     func resetBall() {
         gamePhysics.resetBall()
+        GameInProgress = false;
     }
 }
 
