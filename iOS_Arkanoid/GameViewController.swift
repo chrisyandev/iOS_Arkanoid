@@ -139,33 +139,32 @@ import SpriteKit
     
     @objc
     public func updateScore(newScore: Int) {
+        
         currentScore = newScore
         scoreLabel.text = "SCORE: " + String(newScore)
+        
+        if (currentScore >= 9) {
+            gameScene.resetBall();
+            gameScene.resetPhysics();
+            
+            currentScore = 0
+            scoreLabel.text = "SCORE: " + String(newScore)
+        }
     }
     
     @objc
     public func updateLives(newLives: Int) {
+        
         livesRemaining = newLives
         livesLabel.text = "LIVES: " + String(newLives)
+        
+        if (livesRemaining <= 0) {
+            gameScene.resetBall();
+            gameScene.resetPhysics();
+            
+            livesRemaining = 3
+            livesLabel.text = "LIVES: " + String(newLives)
+        }
     }
     
-    func getScreenBounds() -> CGRect {
-        
-        // retrieve the SCNView
-        let scnView = self.view as! SCNView
-        
-        let screenSize = scnView.bounds
-        
-        let lowerLeft = scnView.unprojectPoint(SCNVector3Zero)
-        let upperRight = scnView.unprojectPoint(SCNVector3(x: Float(screenSize.width), 
-                                                           y: Float(screenSize.height),
-                                                           z: 0))
-        
-        let screenBounds = CGRect(x: CGFloat(lowerLeft.x),
-                                  y: CGFloat(lowerLeft.y),
-                                  width: CGFloat(upperRight.x - lowerLeft.x),
-                                  height: CGFloat(upperRight.y - lowerLeft.y))
-        
-        return screenBounds
-    }
 }

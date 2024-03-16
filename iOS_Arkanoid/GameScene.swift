@@ -179,7 +179,6 @@ class GameScene: SCNScene {
     @MainActor
     func handleTap() {
         if ( !GameInProgress ) {
-            print("gameinprog")
             gamePhysics.launchBall()
             GameInProgress = true
         }
@@ -194,13 +193,20 @@ class GameScene: SCNScene {
     
     @MainActor
     func resetPhysics() {
+        
         gamePhysics.reset()
-        let theBrick = rootNode.childNode(withName: "Brick", recursively: true)
-        theBrick?.isHidden = false
+        
+        for node in self.rootNode.childNodes {
+            if let nodeName = node.name, nodeName.hasPrefix("Brick") {
+                print("y")
+                node.isHidden = false
+            }
+        }
     }
     
     @MainActor
     func resetBall() {
+        
         gamePhysics.resetBall()
         GameInProgress = false;
     }

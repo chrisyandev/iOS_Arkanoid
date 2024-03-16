@@ -79,28 +79,7 @@ public:
         struct PhysicsObject *newObj = new struct PhysicsObject;
         newObj->objType = ObjTypeBrick;
         
-        for (int row = 0; row < BRICK_ROW_COUNT; row++) {
-            for (int col = 0; col < BRICK_COL_COUNT; col++) {
-                newObj = new struct PhysicsObject;
-                
-                // Set the identifier of the brick
-                char *objName;
-                std::string nameConcat = "Brick" + std::to_string(row) + std::to_string(col);
-                const char *nameConcatCStr = nameConcat.c_str();
-                objName = strdup(nameConcatCStr);
-                newObj->name = objName;
-                
-                // Set the physics location of the brick
-                newObj->loc.x = BRICK_POS_X + col * BRICK_WIDTH + BRICK_SPACER;
-                newObj->loc.y = BRICK_POS_Y + row * BRICK_HEIGHT + BRICK_SPACER;
-                // Add variation to column positions
-                if (row % 2 == 0) {
-                    newObj->loc.x += BRICK_WIDTH/2;
-                }
-                
-                [self AddObject:objName newObject:newObj];
-            }
-        }
+        [self ResetBricks];
         
         // Create ball object
         char *objName;
@@ -270,6 +249,35 @@ public:
     ((b2Body *)theBall->b2ShapePtr)->SetActive(true);
 }
 
+- (void) ResetBricks {
+    // Set up the brick and ball objects for Box2D
+    struct PhysicsObject *newObj = new struct PhysicsObject;
+    newObj->objType = ObjTypeBrick;
+    
+    for (int row = 0; row < BRICK_ROW_COUNT; row++) {
+        for (int col = 0; col < BRICK_COL_COUNT; col++) {
+            newObj = new struct PhysicsObject;
+            
+            // Set the identifier of the brick
+            char *objName;
+            std::string nameConcat = "Brick" + std::to_string(row) + std::to_string(col);
+            const char *nameConcatCStr = nameConcat.c_str();
+            objName = strdup(nameConcatCStr);
+            newObj->name = objName;
+            
+            // Set the physics location of the brick
+            newObj->loc.x = BRICK_POS_X + col * BRICK_WIDTH + BRICK_SPACER;
+            newObj->loc.y = BRICK_POS_Y + row * BRICK_HEIGHT + BRICK_SPACER;
+            // Add variation to column positions
+            if (row % 2 == 0) {
+                newObj->loc.x += BRICK_WIDTH/2;
+            }
+            
+            [self AddObject:objName newObject:newObj];
+        }
+    }
+}
+
 - (void) MovePaddleX:(float)x {
     nextPaddlePosX += x;
     
@@ -318,7 +326,7 @@ public:
             dynamicBox.SetAsBox(BRICK_WIDTH/2, BRICK_HEIGHT/2);
             fixtureDef.shape = &dynamicBox;
             fixtureDef.density = 1.0f;
-            fixtureDef.friction = 0.3f;
+            fixtureDef.friction = 0.0f;
             fixtureDef.restitution = 1.0f;
             break;
         case ObjTypeBall:
@@ -333,21 +341,21 @@ public:
             dynamicBox.SetAsBox(PADDLE_WIDTH/2, PADDLE_HEIGHT/2);
             fixtureDef.shape = &dynamicBox;
             fixtureDef.density = 1.0f;
-            fixtureDef.friction = 0.3f;
+            fixtureDef.friction = 0.0f;
             fixtureDef.restitution = 1.0f;
             break;
         case ObjTypeWallNorth:
             dynamicBox.SetAsBox(WALL_NORTH_WIDTH/2, WALL_NORTH_HEIGHT/2);
             fixtureDef.shape = &dynamicBox;
             fixtureDef.density = 1.0f;
-            fixtureDef.friction = 0.3f;
+            fixtureDef.friction = 0.0f;
             fixtureDef.restitution = 1.0f;
             break;
         case ObjTypeWallSides:
             dynamicBox.SetAsBox(WALL_EASTWEST_WIDTH/2, WALL_EASTWEST_HEIGHT/2);
             fixtureDef.shape = &dynamicBox;
             fixtureDef.density = 1.0f;
-            fixtureDef.friction = 0.3f;
+            fixtureDef.friction = 0.0f;
             fixtureDef.restitution = 1.0f;
             break;
         default:
@@ -379,6 +387,8 @@ public:
     theBrick->objType = ObjTypeBrick;
     char *objName = strdup("Brick");
     [self AddObject:objName newObject:theBrick];
+    
+    [self ResetBricks];
     
     // Look up the ball object and re-initialize the position, etc.
     struct PhysicsObject *theBall = physicsObjects["Ball"];
