@@ -52,6 +52,7 @@ struct PhysicsObject {
 -(void) ResetBall;                  // Reset the ball after a life loss
 -(void) MovePaddleX:(float)x;       // Move the paddle on X axis
 -(void) Update:(float)elapsedTime;  // Update the Box2D engine
+-(void) RegisterPaddleHit:(char* )name;
 -(void) RegisterHit:(char* )name;   // Register when the ball hits the brick
 -(void) AddObject:(char *)name newObject:(struct PhysicsObject *)newObj;    // Add a new physics object
 -(struct PhysicsObject *) GetObject:(const char *)name; // Get a physics object by name

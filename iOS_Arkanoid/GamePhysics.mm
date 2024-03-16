@@ -37,6 +37,11 @@ public:
                 // Call RegisterHit (assume CBox2D object is in user data)
                 [parentObj RegisterHit:objData->name];    // assumes RegisterHit is a callback function to register collision
             }
+            
+            if (objData->objType == ObjTypePaddle) {
+                [parentObj RegisterPaddleHit:objData->name];
+            }
+            
         }
     }
     void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {};
@@ -225,6 +230,14 @@ public:
         }
     }
     
+}
+
+- (void) RegisterPaddleHit:(char *)name {
+    struct PhysicsObject *theBall = physicsObjects["Ball"];
+    float randomAngle = (float)arc4random_uniform(360) * M_PI / 180.0f;
+    float speed = -9.8f;
+
+    ((b2Body *)theBall->b2ShapePtr)->SetLinearVelocity( b2Vec2(cos(randomAngle)*BALL_VELOCITY, sin(randomAngle)*BALL_VELOCITY) );
 }
 
 - (void) RegisterHit:(char *)name {
