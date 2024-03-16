@@ -163,7 +163,7 @@ import SpriteKit
             gameScene.resetPhysics();
             
             livesRemaining = 3
-            livesLabel.text = "LIVES: " + String(newLives)
+            livesLabel.text = "LIVES: " + String(livesRemaining)
         }
     }
     

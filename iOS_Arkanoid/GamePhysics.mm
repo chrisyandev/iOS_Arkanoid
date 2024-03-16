@@ -32,6 +32,8 @@ public:
             //  class does not know about the CBox2D that's running the physics
             struct PhysicsObject *objData = (struct PhysicsObject *)(bodyA->GetUserData());
             GamePhysics *parentObj = (__bridge GamePhysics *)(objData->gamePhysObj);
+            if (objData->objType == ObjTypeBrick)
+                printf("Detecting a contact on a brick of name: %s, at position: (\%f, %f)\n", objData->name, objData->loc.x, objData->loc.y);
             
             if (objData->objType == ObjTypeBrick) {
                 // Call RegisterHit (assume CBox2D object is in user data)
@@ -204,11 +206,15 @@ public:
     while (!bricksToDestroy.empty()) {
         std::string brickName = bricksToDestroy.front();
         struct PhysicsObject *brick = physicsObjects[brickName];
-        world->DestroyBody((b2Body *)brick->b2ShapePtr);
-        delete brick;
-        brick = nullptr;
-        physicsObjects.erase(brickName);
+        if (brick != nullptr) {
+            printf("Deleting a brick of name: %s, at position: (\%f, %f)\n", brick->name, brick->loc.x, brick->loc.y);
+            world->DestroyBody((b2Body *)brick->b2ShapePtr);
+            delete brick;
+            brick = nullptr;
+            physicsObjects.erase(brickName);
+        }
         bricksToDestroy.pop();
+        
     }
     
     if (world) {
@@ -265,26 +271,32 @@ public:
 - (void) ResetBricks {
     // Set up the brick and ball objects for Box2D
     struct PhysicsObject *newObj = new struct PhysicsObject;
-    newObj->objType = ObjTypeBrick;
+//    newObj->objType = ObjTypeBrick;
     
     for (int row = 0; row < BRICK_ROW_COUNT; row++) {
         for (int col = 0; col < BRICK_COL_COUNT; col++) {
             newObj = new struct PhysicsObject;
             
+            newObj->objType = ObjTypeBrick;
+
+            
             // Set the identifier of the brick
-            char *objName;
             std::string nameConcat = "Brick" + std::to_string(row) + std::to_string(col);
             const char *nameConcatCStr = nameConcat.c_str();
-            objName = strdup(nameConcatCStr);
+            char *objName = strdup(nameConcatCStr);
             newObj->name = objName;
             
             // Set the physics location of the brick
             newObj->loc.x = BRICK_POS_X + col * BRICK_WIDTH + BRICK_SPACER;
             newObj->loc.y = BRICK_POS_Y + row * BRICK_HEIGHT + BRICK_SPACER;
+
             // Add variation to column positions
             if (row % 2 == 0) {
                 newObj->loc.x += BRICK_WIDTH/2;
             }
+            
+            printf("Creating a brick of name: %s, at position: (\%f, %f)\n", newObj->name, newObj->loc.x, newObj->loc.y);
+
             
             [self AddObject:objName newObject:newObj];
         }
@@ -385,6 +397,7 @@ public:
 
 - (void) Reset {
     // Look up the brick, and if it exists, destroy it and delete it
+    
     struct PhysicsObject *theBrick = physicsObjects["Brick"];
     if (theBrick) {
         world->DestroyBody(((b2Body *)theBrick->b2ShapePtr));
@@ -393,13 +406,13 @@ public:
         physicsObjects.erase("Brick");
     }
     
-    // Create a new brick object
-    theBrick = new struct PhysicsObject;
-    theBrick->loc.x = BRICK_POS_X;
-    theBrick->loc.y = BRICK_POS_Y;
-    theBrick->objType = ObjTypeBrick;
-    char *objName = strdup("Brick");
-    [self AddObject:objName newObject:theBrick];
+//    // Create a new brick object
+//    theBrick = new struct PhysicsObject;
+//    theBrick->loc.x = BRICK_POS_X;
+//    theBrick->loc.y = BRICK_POS_Y;
+//    theBrick->objType = ObjTypeBrick;
+//    char *objName = strdup("Brick");
+//    [self AddObject:objName newObject:theBrick];
     
     [self ResetBricks];
     

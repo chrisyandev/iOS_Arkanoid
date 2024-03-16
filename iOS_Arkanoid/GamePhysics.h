@@ -57,6 +57,7 @@ struct PhysicsObject {
 -(void) AddObject:(char *)name newObject:(struct PhysicsObject *)newObj;    // Add a new physics object
 -(struct PhysicsObject *) GetObject:(const char *)name; // Get a physics object by name
 -(void) Reset;                      // Reset Box2D
+-(void) ResetBricks;
 
 @end
 

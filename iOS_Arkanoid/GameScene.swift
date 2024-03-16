@@ -194,11 +194,12 @@ class GameScene: SCNScene {
     @MainActor
     func resetPhysics() {
         
+//        gamePhysics.resetBricks()
         gamePhysics.reset()
         
         for node in self.rootNode.childNodes {
             if let nodeName = node.name, nodeName.hasPrefix("Brick") {
-                print("y")
+//                print("y")
                 node.isHidden = false
             }
         }
