@@ -398,6 +398,9 @@ public:
 - (void) Reset {
     // Look up the brick, and if it exists, destroy it and delete it
     
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@
+    // this code doesn't work because my objects are called Brick00, Brick01, not Brick.
+    // @@@@@@@@@@@@@@@@@@@@@@@@@@
     struct PhysicsObject *theBrick = physicsObjects["Brick"];
     if (theBrick) {
         world->DestroyBody(((b2Body *)theBrick->b2ShapePtr));
@@ -406,13 +409,6 @@ public:
         physicsObjects.erase("Brick");
     }
     
-//    // Create a new brick object
-//    theBrick = new struct PhysicsObject;
-//    theBrick->loc.x = BRICK_POS_X;
-//    theBrick->loc.y = BRICK_POS_Y;
-//    theBrick->objType = ObjTypeBrick;
-//    char *objName = strdup("Brick");
-//    [self AddObject:objName newObject:theBrick];
     
     [self ResetBricks];
     

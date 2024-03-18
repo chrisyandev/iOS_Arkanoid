@@ -199,7 +199,6 @@ class GameScene: SCNScene {
         
         for node in self.rootNode.childNodes {
             if let nodeName = node.name, nodeName.hasPrefix("Brick") {
-//                print("y")
                 node.isHidden = false
             }
         }
