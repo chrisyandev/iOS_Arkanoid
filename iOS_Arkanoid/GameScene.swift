@@ -194,8 +194,9 @@ class GameScene: SCNScene {
     @MainActor
     func resetPhysics() {
         
-//        gamePhysics.resetBricks()
-        gamePhysics.reset()
+        //gamePhysics.reset()
+        gamePhysics.resetBricks()
+
         
         for node in self.rootNode.childNodes {
             if let nodeName = node.name, nodeName.hasPrefix("Brick") {

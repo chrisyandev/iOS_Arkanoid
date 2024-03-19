@@ -398,19 +398,31 @@ public:
 - (void) Reset {
     // Look up the brick, and if it exists, destroy it and delete it
     
+     std::cout << "inside Reset()\n";
+    	
     // @@@@@@@@@@@@@@@@@@@@@@@@@@
     // this code doesn't work because my objects are called Brick00, Brick01, not Brick.
     // @@@@@@@@@@@@@@@@@@@@@@@@@@
-    struct PhysicsObject *theBrick = physicsObjects["Brick"];
-    if (theBrick) {
-        world->DestroyBody(((b2Body *)theBrick->b2ShapePtr));
-        delete theBrick;
-        theBrick = nullptr;
-        physicsObjects.erase("Brick");
-    }
     
+//    struct PhysicsObject *theBrick = physicsObjects["Brick"];
+//    if (theBrick) {
+//        world->DestroyBody(((b2Body *)theBrick->b2ShapePtr));
+//        delete theBrick;
+//        theBrick = nullptr;
+//        physicsObjects.erase("Brick");
+//    }
     
-    [self ResetBricks];
+//    for (std::pair<const std::string, PhysicsObject*> kvPair : physicsObjects) {
+//        std::string key = kvPair.first;
+//        PhysicsObject* obj = kvPair.second;
+//        
+////        std::cout << obj->objType;
+////        if (obj->objType == ObjTypeBrick) {
+////            std::cout << "gay dicks";
+////        }
+//    }
+    
+    //[self ResetBricks];
     
     // Look up the ball object and re-initialize the position, etc.
     struct PhysicsObject *theBall = physicsObjects["Ball"];
