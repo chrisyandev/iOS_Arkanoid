@@ -2,7 +2,9 @@
 
 ## Implementation Notes
 
-For our final assignment, we decided to pick option 3, which is implementation of a 2D iOS game that mimics Breakout (Arkanoid), using the Box2D library. For this project build, the game should be run in Portrait Mode.
+For our final assignment, we decided to pick option 3, which is implementation of a 2D iOS game that mimics Breakout (Arkanoid), using the Box2D library. For this project build, the game should be run in Portrait Mode. 
+
+Our Targeted Device for this assignment is an iPhone 15 Pro.
 
 ## Assignment 3 Instructions
 
