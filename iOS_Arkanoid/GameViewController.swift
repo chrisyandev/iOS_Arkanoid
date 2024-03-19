@@ -143,7 +143,7 @@ import SpriteKit
         currentScore = newScore
         scoreLabel.text = "SCORE: " + String(newScore)
         
-        if (currentScore >= 9) {
+        if (currentScore == 9) {
             gameScene.resetBall();
             gameScene.resetPhysics();
             
@@ -158,7 +158,7 @@ import SpriteKit
         livesRemaining = newLives
         livesLabel.text = "LIVES: " + String(newLives)
         
-        if (livesRemaining <= 0) {
+        if (livesRemaining == 0) {
             gameScene.resetBall();
             gameScene.resetPhysics();
             

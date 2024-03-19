@@ -264,14 +264,33 @@ public:
     ((b2Body *)theBall->b2ShapePtr)->SetTransform(b2Vec2(BALL_POS_X, BALL_POS_Y), 0);
     ((b2Body *)theBall->b2ShapePtr)->SetLinearVelocity(b2Vec2(0, 0));
     ((b2Body *)theBall->b2ShapePtr)->SetAngularVelocity(0);
-    ((b2Body *)theBall->b2ShapePtr)->SetAwake(false);
-    ((b2Body *)theBall->b2ShapePtr)->SetActive(true);
 }
 
 - (void) ResetBricks {
+    
+    // Delete
+    for (int row = 0; row < BRICK_ROW_COUNT; row++) {
+        for (int col = 0; col < BRICK_COL_COUNT; col++) {
+
+            // Set the identifier of the brick
+            std::string nameConcat = "Brick" + std::to_string(row) + std::to_string(col);
+            struct PhysicsObject *theBrick = physicsObjects[nameConcat];
+            
+            if (theBrick) {
+                world->DestroyBody(((b2Body *)theBrick->b2ShapePtr));
+                delete theBrick;
+                theBrick = nullptr;
+                physicsObjects.erase(nameConcat);
+                
+                std::cout << "Deleting leftover\n";
+            }
+
+        }
+    }
+
+    
     // Set up the brick and ball objects for Box2D
     struct PhysicsObject *newObj = new struct PhysicsObject;
-//    newObj->objType = ObjTypeBrick;
     
     for (int row = 0; row < BRICK_ROW_COUNT; row++) {
         for (int col = 0; col < BRICK_COL_COUNT; col++) {
@@ -395,59 +414,59 @@ public:
     return physicsObjects[name];
 }
 
-- (void) Reset {
-    // Look up the brick, and if it exists, destroy it and delete it
-    
-     std::cout << "inside Reset()\n";
-    	
-    // @@@@@@@@@@@@@@@@@@@@@@@@@@
-    // this code doesn't work because my objects are called Brick00, Brick01, not Brick.
-    // @@@@@@@@@@@@@@@@@@@@@@@@@@
-    
-//    struct PhysicsObject *theBrick = physicsObjects["Brick"];
-//    if (theBrick) {
-//        world->DestroyBody(((b2Body *)theBrick->b2ShapePtr));
-//        delete theBrick;
-//        theBrick = nullptr;
-//        physicsObjects.erase("Brick");
-//    }
-    
-//    for (std::pair<const std::string, PhysicsObject*> kvPair : physicsObjects) {
-//        std::string key = kvPair.first;
-//        PhysicsObject* obj = kvPair.second;
-//        
-////        std::cout << obj->objType;
-////        if (obj->objType == ObjTypeBrick) {
-////            std::cout << "gay dicks";
-////        }
-//    }
-    
-    //[self ResetBricks];
-    
-    // Look up the ball object and re-initialize the position, etc.
-    struct PhysicsObject *theBall = physicsObjects["Ball"];
-    theBall->loc.x = BALL_POS_X;
-    theBall->loc.y = BALL_POS_Y;
-    ((b2Body *)theBall->b2ShapePtr)->SetTransform(b2Vec2(BALL_POS_X, BALL_POS_Y), 0);
-    ((b2Body *)theBall->b2ShapePtr)->SetLinearVelocity(b2Vec2(0, 0));
-    ((b2Body *)theBall->b2ShapePtr)->SetAngularVelocity(0);
-    ((b2Body *)theBall->b2ShapePtr)->SetAwake(false);
-    ((b2Body *)theBall->b2ShapePtr)->SetActive(true);
-    
-    // Look up the paddle object and re-initialize the position, etc.
-    struct PhysicsObject *thePaddle = physicsObjects["Paddle"];
-    thePaddle->loc.x = PADDLE_POS_X;
-    thePaddle->loc.y = PADDLE_POS_Y;
-    ((b2Body *)thePaddle->b2ShapePtr)->SetTransform(b2Vec2(PADDLE_POS_X, PADDLE_POS_Y), 0);
-    ((b2Body *)thePaddle->b2ShapePtr)->SetLinearVelocity(b2Vec2(0, 0));
-    ((b2Body *)thePaddle->b2ShapePtr)->SetAngularVelocity(0);
-    ((b2Body *)thePaddle->b2ShapePtr)->SetAwake(false);
-    ((b2Body *)thePaddle->b2ShapePtr)->SetActive(true);
-    
-    totalElapsedTime = 0;
-    ballHitBrick = false;
-    ballLaunched = false;
-    nextPaddlePosX = PADDLE_POS_X;
-}
+//- (void) Reset {
+//    // Look up the brick, and if it exists, destroy it and delete it
+//    
+//     std::cout << "inside Reset()\n";
+//    	
+//    // @@@@@@@@@@@@@@@@@@@@@@@@@@
+//    // this code doesn't work because my objects are called Brick00, Brick01, not Brick.
+//    // @@@@@@@@@@@@@@@@@@@@@@@@@@
+//    
+////    struct PhysicsObject *theBrick = physicsObjects["Brick"];
+////    if (theBrick) {
+////        world->DestroyBody(((b2Body *)theBrick->b2ShapePtr));
+////        delete theBrick;
+////        theBrick = nullptr;
+////        physicsObjects.erase("Brick");
+////    }
+//    
+////    for (std::pair<const std::string, PhysicsObject*> kvPair : physicsObjects) {
+////        std::string key = kvPair.first;
+////        PhysicsObject* obj = kvPair.second;
+////        
+//////        std::cout << obj->objType;
+//////        if (obj->objType == ObjTypeBrick) {
+//////            std::cout << "gay dicks";
+//////        }
+////    }
+//    
+//    //[self ResetBricks];
+//    
+//    // Look up the ball object and re-initialize the position, etc.
+//    struct PhysicsObject *theBall = physicsObjects["Ball"];
+//    theBall->loc.x = BALL_POS_X;
+//    theBall->loc.y = BALL_POS_Y;
+//    ((b2Body *)theBall->b2ShapePtr)->SetTransform(b2Vec2(BALL_POS_X, BALL_POS_Y), 0);
+//    ((b2Body *)theBall->b2ShapePtr)->SetLinearVelocity(b2Vec2(0, 0));
+//    ((b2Body *)theBall->b2ShapePtr)->SetAngularVelocity(0);
+//    ((b2Body *)theBall->b2ShapePtr)->SetAwake(false);
+//    ((b2Body *)theBall->b2ShapePtr)->SetActive(true);
+//    
+//    // Look up the paddle object and re-initialize the position, etc.
+//    struct PhysicsObject *thePaddle = physicsObjects["Paddle"];
+//    thePaddle->loc.x = PADDLE_POS_X;
+//    thePaddle->loc.y = PADDLE_POS_Y;
+//    ((b2Body *)thePaddle->b2ShapePtr)->SetTransform(b2Vec2(PADDLE_POS_X, PADDLE_POS_Y), 0);
+//    ((b2Body *)thePaddle->b2ShapePtr)->SetLinearVelocity(b2Vec2(0, 0));
+//    ((b2Body *)thePaddle->b2ShapePtr)->SetAngularVelocity(0);
+//    ((b2Body *)thePaddle->b2ShapePtr)->SetAwake(false);
+//    ((b2Body *)thePaddle->b2ShapePtr)->SetActive(true);
+//    
+//    totalElapsedTime = 0;
+//    ballHitBrick = false;
+//    ballLaunched = false;
+//    nextPaddlePosX = PADDLE_POS_X;
+//}
 
 @end
