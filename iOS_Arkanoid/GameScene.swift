@@ -45,9 +45,6 @@ class GameScene: SCNScene {
     
     
     func addWalls() {
-        
-        //let screenSize = viewController.getScreenBounds()
-        //let screenSize = CGRect(x: 0, y: 100, width: 50, height: Int(WALL_THICKNESS))
         let topWallPos = SCNVector3(x: WALL_NORTH_POS_X, y: WALL_NORTH_POS_Y, z: 0)
         let leftWallPos = SCNVector3(x: WALL_WEST_POS_X, y: WALL_EASTWEST_POS_Y, z: 0)
         let rightWallPos = SCNVector3(x: WALL_EAST_POS_X, y: WALL_EASTWEST_POS_Y, z: 0)

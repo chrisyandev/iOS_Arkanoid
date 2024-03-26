@@ -6,6 +6,10 @@ For our final assignment, we decided to pick option 3, which is implementation o
 
 Our Targeted Device for this assignment is an iPhone 15 Pro. (Walls are hard coded for this phones resolution of [2556 x 1179] Pixels)
 
+Controls:
+- Drag to move the paddle
+- Double-tap to launch the ball
+
 ## Assignment 3 Instructions
 
 Implement a 2D iOS game that mimics Breakout (Arkanoid), using the Box2D library. You do not need to worry about a 100% faithful reproduction in terms of content, colours, levels, etc. Only the core game essence is required. Use your own drawing functions instead of the drawing systems or debug drawing of Box2D.
@@ -23,7 +27,5 @@ Submit your entire project, including documentation (at least a README file with
 Be sure to include in your README which question you are answering, and any special instructions for building and running the solution.
 
 The code must be written in some combination of Objective-C or Swift and Objective-C++ and/or C++, and all files required to build and deploy the app must be provided.
-
-Submit your entire project, including documentation (at least a README file with any notes and a description of the user controls for each part) to the D2L dropbox.
 
 You are to work in groups of two or three and all will receive the same mark. Your submission should be in a single ZIP file using the naming convention A00ABC_A00DEF_Asst3.zip or A00ABC_A00DEF_GHI_Asst3.zip, where ABC, DEF and GHI are your student numbers.

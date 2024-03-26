@@ -210,7 +210,6 @@ public:
 - (void) RegisterPaddleHit:(char *)name {
     struct PhysicsObject *theBall = physicsObjects["Ball"];
     float randomAngle = (float)arc4random_uniform(360) * M_PI / 180.0f;
-    float speed = -9.8f;
 
     ((b2Body *)theBall->b2ShapePtr)->SetLinearVelocity( b2Vec2(cos(randomAngle)*BALL_VELOCITY, sin(randomAngle)*BALL_VELOCITY) );
 }

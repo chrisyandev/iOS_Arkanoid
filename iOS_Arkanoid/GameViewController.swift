@@ -30,18 +30,6 @@ import SpriteKit
         gameScene = GameScene()
         gameScene.viewController = self
         
-        // create and add a camera to the scene
-        
-        // place the camera
-
-        // create and add a light to the scene
-        
-        // create and add an ambient light to the scene
-        
-        // retrieve the ship node
-        
-        // animate the 3d object
-        
         // retrieve the SCNView
         let scnView = self.view as! SCNView
         scnView.scene = gameScene
