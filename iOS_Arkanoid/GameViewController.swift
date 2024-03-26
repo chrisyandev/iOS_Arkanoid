@@ -139,13 +139,32 @@ import SpriteKit
     
     @objc
     public func updateScore(newScore: Int) {
+        
         currentScore = newScore
         scoreLabel.text = "SCORE: " + String(newScore)
+        
+        if (currentScore == 9) {
+            gameScene.resetBall();
+            gameScene.resetPhysics();
+            
+            currentScore = 0
+            scoreLabel.text = "SCORE: " + String(newScore)
+        }
     }
     
     @objc
     public func updateLives(newLives: Int) {
+        
         livesRemaining = newLives
         livesLabel.text = "LIVES: " + String(newLives)
+        
+        if (livesRemaining == 0) {
+            gameScene.resetBall();
+            gameScene.resetPhysics();
+            
+            livesRemaining = 3
+            livesLabel.text = "LIVES: " + String(livesRemaining)
+        }
     }
+    
 }

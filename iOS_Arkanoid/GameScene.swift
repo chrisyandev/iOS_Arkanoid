@@ -10,6 +10,8 @@ class GameScene: SCNScene {
     var viewController: GameViewController!
     var bricksDestroyed: Int = 0
     
+    var GameInProgress: Bool = false
+    
     override init() {
         super.init()
         
@@ -19,6 +21,7 @@ class GameScene: SCNScene {
         addBall()
         addBricks()
         addPaddle()
+        addWalls()
         
         gamePhysics = GamePhysics()
         
@@ -39,6 +42,48 @@ class GameScene: SCNScene {
         rootNode.addChildNode(cameraNode)
     }
     
+    
+    
+    func addWalls() {
+        
+        //let screenSize = viewController.getScreenBounds()
+        //let screenSize = CGRect(x: 0, y: 100, width: 50, height: Int(WALL_THICKNESS))
+        let topWallPos = SCNVector3(x: WALL_NORTH_POS_X, y: WALL_NORTH_POS_Y, z: 0)
+        let leftWallPos = SCNVector3(x: WALL_WEST_POS_X, y: WALL_EASTWEST_POS_Y, z: 0)
+        let rightWallPos = SCNVector3(x: WALL_EAST_POS_X, y: WALL_EASTWEST_POS_Y, z: 0)
+        
+        let northWall = SCNNode(geometry: SCNBox(width: CGFloat(WALL_NORTH_WIDTH), 
+                                                 height: CGFloat(WALL_NORTH_HEIGHT),
+                                                 length: 10,
+                                                 chamferRadius: 0))
+        let westWall = SCNNode(geometry: SCNBox(width:CGFloat(WALL_EASTWEST_WIDTH),
+                                                height: CGFloat(WALL_EASTWEST_HEIGHT),
+                                                length: 10,
+                                                chamferRadius: 0))
+        let eastWall = SCNNode(geometry: SCNBox(width:CGFloat(WALL_EASTWEST_WIDTH), 
+                                                height: CGFloat(WALL_EASTWEST_HEIGHT),
+                                                length: 10,
+                                                chamferRadius: 0))
+        
+        northWall.geometry?.firstMaterial?.diffuse.contents = UIColor.gray
+        westWall.geometry?.firstMaterial?.diffuse.contents = UIColor.gray
+        eastWall.geometry?.firstMaterial?.diffuse.contents = UIColor.gray
+
+        northWall.position = topWallPos
+        westWall.position = leftWallPos
+        eastWall.position = rightWallPos
+        
+        northWall.name = "NorthWall"
+        westWall.name = "WestWall"
+        eastWall.name = "EastWall"
+        
+        rootNode.addChildNode(northWall)
+        rootNode.addChildNode(westWall)
+        rootNode.addChildNode(eastWall)
+        
+    }
+    
+
     
     func addBricks() {
         for row in 0..<BRICK_ROW_COUNT {
@@ -71,7 +116,7 @@ class GameScene: SCNScene {
     }
     
     func addPaddle() {
-        let thePaddle = SCNNode(geometry: SCNBox(width: CGFloat(PADDLE_WIDTH), height: CGFloat(PADDLE_HEIGHT), length: 1, chamferRadius: 0))
+        let thePaddle = SCNNode(geometry: SCNBox(width: CGFloat(PADDLE_WIDTH), height: CGFloat(PADDLE_HEIGHT), length: 1, chamferRadius: 1))
         thePaddle.name = "Paddle"
         thePaddle.geometry?.firstMaterial?.diffuse.contents = UIColor.white
         thePaddle.position = SCNVector3(Int(PADDLE_POS_X), Int(PADDLE_POS_Y), 0)
@@ -129,7 +174,10 @@ class GameScene: SCNScene {
     
     @MainActor
     func handleTap() {
-        gamePhysics.launchBall()
+        if ( !GameInProgress ) {
+            gamePhysics.launchBall()
+            GameInProgress = true
+        }
     }
     
     @MainActor
@@ -141,14 +189,21 @@ class GameScene: SCNScene {
     
     @MainActor
     func resetPhysics() {
-        gamePhysics.reset()
-        let theBrick = rootNode.childNode(withName: "Brick", recursively: true)
-        theBrick?.isHidden = false
+        
+        gamePhysics.resetBricks()
+        
+        for node in self.rootNode.childNodes {
+            if let nodeName = node.name, nodeName.hasPrefix("Brick") {
+                node.isHidden = false
+            }
+        }
     }
     
     @MainActor
     func resetBall() {
+        
         gamePhysics.resetBall()
+        GameInProgress = false;
     }
 }
 
