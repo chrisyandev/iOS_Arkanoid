@@ -32,6 +32,7 @@ public:
             //  class does not know about the CBox2D that's running the physics
             struct PhysicsObject *objData = (struct PhysicsObject *)(bodyA->GetUserData());
             GamePhysics *parentObj = (__bridge GamePhysics *)(objData->gamePhysObj);
+            
             if (objData->objType == ObjTypeBrick)
                 printf("Detecting a contact on a brick of name: %s, at position: (\%f, %f)\n", objData->name, objData->loc.x, objData->loc.y);
             
@@ -169,38 +170,6 @@ public:
         ballLaunched = false;
     }
     
-//    // Check if it is time yet to drop the brick, and if so call SetAwake()
-//    totalElapsedTime += elapsedTime;
-//    if ((totalElapsedTime > BRICK_WAIT) && theBrick && theBrick->b2ShapePtr) {
-//        ((b2Body *)theBrick->b2ShapePtr)->SetAwake(true);
-//    }
-    
-    // Use these lines for debugging the brick and ball positions
-    //    if (theBrick)
-    //        printf("Brick: %4.2f %4.2f\t",
-    //               ((b2Body *)theBrick->b2ShapePtr)->GetPosition().x,
-    //               ((b2Body *)theBrick->b2ShapePtr)->GetPosition().y);
-    //    if (theBall &&  theBall->b2ShapePtr)
-    //        printf("Ball: %4.2f %4.2f",
-    //               ((b2Body *)theBall->b2ShapePtr)->GetPosition().x,
-    //               ((b2Body *)theBall->b2ShapePtr)->GetPosition().y);
-    //    printf("\n");
-    
-    // If the last collision test was positive, stop the ball and destroy the brick
-//    if (ballHitBrick) {
-        // Stop the ball and make sure it is not affected by forces
-//        ((b2Body *)theBall->b2ShapePtr)->SetLinearVelocity(b2Vec2(0, 0));
-//        ((b2Body *)theBall->b2ShapePtr)->SetAngularVelocity(0);
-//        ((b2Body *)theBall->b2ShapePtr)->SetAwake(false);
-//        ((b2Body *)theBall->b2ShapePtr)->SetActive(false);
-        
-        // Destroy the brick from Box2D and related objects in this class
-//        world->DestroyBody(((b2Body *)theBrick->b2ShapePtr));
-//        delete theBrick;
-//        theBrick = nullptr;
-//        physicsObjects.erase("Brick");
-//        ballHitBrick = false;   // until a reset and re-launch
-//    }
     
     // Destroy next brick in the queue
     while (!bricksToDestroy.empty()) {
@@ -282,7 +251,7 @@ public:
                 theBrick = nullptr;
                 physicsObjects.erase(nameConcat);
                 
-                std::cout << "Deleting leftover\n";
+                std::cout << "Deleting leftover bricks on GameOver\n";
             }
 
         }
@@ -315,7 +284,6 @@ public:
             }
             
             printf("Creating a brick of name: %s, at position: (\%f, %f)\n", newObj->name, newObj->loc.x, newObj->loc.y);
-
             
             [self AddObject:objName newObject:newObj];
         }
@@ -414,59 +382,5 @@ public:
     return physicsObjects[name];
 }
 
-//- (void) Reset {
-//    // Look up the brick, and if it exists, destroy it and delete it
-//    
-//     std::cout << "inside Reset()\n";
-//    	
-//    // @@@@@@@@@@@@@@@@@@@@@@@@@@
-//    // this code doesn't work because my objects are called Brick00, Brick01, not Brick.
-//    // @@@@@@@@@@@@@@@@@@@@@@@@@@
-//    
-////    struct PhysicsObject *theBrick = physicsObjects["Brick"];
-////    if (theBrick) {
-////        world->DestroyBody(((b2Body *)theBrick->b2ShapePtr));
-////        delete theBrick;
-////        theBrick = nullptr;
-////        physicsObjects.erase("Brick");
-////    }
-//    
-////    for (std::pair<const std::string, PhysicsObject*> kvPair : physicsObjects) {
-////        std::string key = kvPair.first;
-////        PhysicsObject* obj = kvPair.second;
-////        
-//////        std::cout << obj->objType;
-//////        if (obj->objType == ObjTypeBrick) {
-//////            std::cout << "gay dicks";
-//////        }
-////    }
-//    
-//    //[self ResetBricks];
-//    
-//    // Look up the ball object and re-initialize the position, etc.
-//    struct PhysicsObject *theBall = physicsObjects["Ball"];
-//    theBall->loc.x = BALL_POS_X;
-//    theBall->loc.y = BALL_POS_Y;
-//    ((b2Body *)theBall->b2ShapePtr)->SetTransform(b2Vec2(BALL_POS_X, BALL_POS_Y), 0);
-//    ((b2Body *)theBall->b2ShapePtr)->SetLinearVelocity(b2Vec2(0, 0));
-//    ((b2Body *)theBall->b2ShapePtr)->SetAngularVelocity(0);
-//    ((b2Body *)theBall->b2ShapePtr)->SetAwake(false);
-//    ((b2Body *)theBall->b2ShapePtr)->SetActive(true);
-//    
-//    // Look up the paddle object and re-initialize the position, etc.
-//    struct PhysicsObject *thePaddle = physicsObjects["Paddle"];
-//    thePaddle->loc.x = PADDLE_POS_X;
-//    thePaddle->loc.y = PADDLE_POS_Y;
-//    ((b2Body *)thePaddle->b2ShapePtr)->SetTransform(b2Vec2(PADDLE_POS_X, PADDLE_POS_Y), 0);
-//    ((b2Body *)thePaddle->b2ShapePtr)->SetLinearVelocity(b2Vec2(0, 0));
-//    ((b2Body *)thePaddle->b2ShapePtr)->SetAngularVelocity(0);
-//    ((b2Body *)thePaddle->b2ShapePtr)->SetAwake(false);
-//    ((b2Body *)thePaddle->b2ShapePtr)->SetActive(true);
-//    
-//    totalElapsedTime = 0;
-//    ballHitBrick = false;
-//    ballLaunched = false;
-//    nextPaddlePosX = PADDLE_POS_X;
-//}
 
 @end

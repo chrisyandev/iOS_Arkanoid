@@ -46,10 +46,6 @@ class GameScene: SCNScene {
     
     func addWalls() {
         
-        print("Swift is powerful")
-        
-        //print(viewController.livesRemaining)
-        
         //let screenSize = viewController.getScreenBounds()
         //let screenSize = CGRect(x: 0, y: 100, width: 50, height: Int(WALL_THICKNESS))
         let topWallPos = SCNVector3(x: WALL_NORTH_POS_X, y: WALL_NORTH_POS_Y, z: 0)
@@ -194,9 +190,7 @@ class GameScene: SCNScene {
     @MainActor
     func resetPhysics() {
         
-        //gamePhysics.reset()
         gamePhysics.resetBricks()
-
         
         for node in self.rootNode.childNodes {
             if let nodeName = node.name, nodeName.hasPrefix("Brick") {
